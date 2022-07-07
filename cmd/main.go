@@ -1,30 +1,30 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"log"
+
+	"github.com/PanGan21/miniraft/pkg"
 )
 
-var VALIDATION_ERROR = errors.New("validation error; flags cannot have the default values")
+var (
+	serverName = flag.String("server-name", "", "name for the server")
+	port       = flag.String("port", "", "port for running the server")
+)
 
 func main() {
-	port := flag.Int("port", 0, "rpc listen port")
-	peer_addresses := flag.String("peer_addresses", "", "comma separated peer addresses")
-	id := flag.Int("id", 0, "node id")
-
 	flag.Parse()
+	validateFlags()
 
-	err := validate_flags(*port, *peer_addresses, *id)
-	if err != nil {
-		log.Fatal(err)
-	}
+	pkg.StartServer(*&serverName, *&port)
 }
 
-func validate_flags(port int, peer_addresses string, id int) error {
-	if port == 0 || id == 0 || peer_addresses == "" {
-		return VALIDATION_ERROR
+func validateFlags() {
+	if *serverName == "" {
+		log.Fatalf("Must provide serverName for the server")
 	}
 
-	return nil
+	if *port == "" {
+		log.Fatalf("Must provide a port number for server to run")
+	}
 }
